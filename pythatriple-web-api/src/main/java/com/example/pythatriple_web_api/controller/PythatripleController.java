@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.constraints.Positive;
+
 import com.example.pythatriple_web_api.dto.PythatripleResponse;
 import com.example.pythatriple_web_api.service.PythatripleService;
 
@@ -22,7 +24,7 @@ public class PythatripleController {
 
 	@GetMapping("triples")
 	public ResponseEntity<?> getTriples(
-		@RequestParam(name = "hypotenuse_squared") int hypotSq
+		@RequestParam(name = "hypotenuse_squared") @Positive int hypotSq
 	) {
 		PythatripleResponse result = service.getTriples(hypotSq);
 
