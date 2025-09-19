@@ -21,8 +21,10 @@ public class PythatripleController {
 	private PythatripleService service;
 
 	@GetMapping("triples")
-	public ResponseEntity<?> getTriples(@RequestParam Integer value) {
-		PythatripleResponse result = service.calculateTriples(value);
+	public ResponseEntity<?> getTriples(
+		@RequestParam(name = "hypotenuse_squared") int hypotSq
+	) {
+		PythatripleResponse result = service.getTriples(hypotSq);
 
 		return ResponseEntity.ok().body(
 			(result == null) ? Map.of() : result

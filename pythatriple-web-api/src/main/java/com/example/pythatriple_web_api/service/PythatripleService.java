@@ -6,7 +6,7 @@ import com.example.pythatriple_web_api.dto.PythatripleResponse;
 
 @Service
 public class PythatripleService {
-	private PythatripleResponse getTriples(int value) {
+	public PythatripleResponse getTriples(int hypotSq) {
 		return null;
 	}
 }
