@@ -18,23 +18,38 @@ public class PythatripleResult {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "hypotenuse_squared", nullable = false, unique = true)
+	@Column(
+		name = "hypotenuse_squared", nullable = false, unique = true,
+		columnDefinition = "BIGINT UNSIGNED"
+	)
 	private Integer hypotSq;
 
-	@Column(name = "leg_a")
+	@Column(
+		name = "leg_a", nullable = true,
+		columnDefinition = "INT UNSIGNED"
+	)
 	private Integer a;
 
-	@Column(name = "leg_b")
+	@Column(
+		name = "leg_b", nullable = true,
+		columnDefinition = "INT UNSIGNED"
+	)
 	private Integer b;
 
-	@Column(name = "hypotenuse")
+	@Column(
+		name = "hypotenuse", nullable = true,
+		columnDefinition = "INT UNSIGNED"
+	)
 	private Integer c;
 
-	@Column(name = "average")
+	@Column(name = "average", nullable = true)
 	private Double avg;
 
 	@CreationTimestamp
-	@Column(name = "created_at", nullable = false, updatable = false)
+	@Column(
+		name = "created_at", nullable = false, updatable = false,
+		columnDefinition = "TIMESTAMP"
+	)
 	private LocalDateTime timestamp;
 
 	protected PythatripleResult() {}
