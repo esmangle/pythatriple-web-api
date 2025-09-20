@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.pythatriple_web_api.dto.PythatripleResponse;
+import com.example.pythatriple_web_api.dto.PythatripleTableResponse;
 import com.example.pythatriple_web_api.model.PythatripleResult;
 import com.example.pythatriple_web_api.repository.PythatripleResultRepository;
 
@@ -17,12 +18,12 @@ public class PythatripleService {
 	@Autowired
 	private PythatripleResultRepository repository;
 
-	public List<PythatripleResponse> getAllTriples() {
+	public List<PythatripleTableResponse> getAllTriples() {
 		return repository.findAllByOrderByTimestampDesc()
 			.stream()
 			.filter(PythatripleResult::isValid)
-			.map(result -> new PythatripleResponse(
-				result.getA(), result.getB(), result.getC(), result.getAvg()
+			.map(r -> new PythatripleTableResponse(
+				r.getHypotSq(), r.getA(), r.getB(), r.getC(), r.getAvg()
 			))
 			.collect(Collectors.toList());
 	}
