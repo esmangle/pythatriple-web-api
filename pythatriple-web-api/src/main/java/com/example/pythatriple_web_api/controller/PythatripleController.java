@@ -1,17 +1,20 @@
 package com.example.pythatriple_web_api.controller;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.Valid;
 
-import com.example.pythatriple_web_api.dto.PythatripleResponse;
+import com.example.pythatriple_web_api.dto.PythatripleRequest;
 import com.example.pythatriple_web_api.service.PythatripleService;
 
 
@@ -24,9 +27,21 @@ public class PythatripleController {
 
 	@GetMapping("triples")
 	public ResponseEntity<?> getTriples(
-		@RequestParam(name = "hypotenuse_squared") @Positive int hypotSq
+		@Valid @ModelAttribute PythatripleRequest req,
+		BindingResult br
 	) {
-		PythatripleResponse result = service.getTriples(hypotSq);
+		if (br.hasErrors()) {
+			var errors = br.getFieldErrors()
+				.stream()
+				.collect(Collectors.toMap(
+					FieldError::getField,
+					FieldError::getDefaultMessage
+				));
+
+			return ResponseEntity.badRequest().body(errors);
+		}
+
+		var result = service.getTriples(req.hypotenuse_squared());
 
 		return ResponseEntity.ok().body(
 			(result == null) ? Map.of() : result
