@@ -1,5 +1,19 @@
 spring boot backend + frontend example project, developed with VS Code on Debian Linux
 
+## Database Schema
+
+```sql
+CREATE TABLE IF NOT EXISTS triple_results (
+    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    hypotenuse_squared INT UNSIGNED NOT NULL UNIQUE,
+    leg_a INT UNSIGNED NULL,
+    leg_b INT UNSIGNED NULL,
+    hypotenuse INT UNSIGNED NULL,
+    average DOUBLE NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+```
+
 ## Web API (Back-end)
 
 Technologies used:
