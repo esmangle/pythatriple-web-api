@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -28,6 +29,7 @@ public class PythatripleControllerTest {
 	private PythatripleService service;
 
 	@Test
+	@DisplayName("GET /api/triples?hypotenuse_squared=25 returns a valid triple")
 	void testGetTriples_ValidTriple() throws Exception {
 		when(service.getTriples(25)).thenReturn(
 			Optional.of(new PythatripleResponse(3, 4, 5, 4.0))
@@ -42,6 +44,7 @@ public class PythatripleControllerTest {
 	}
 
 	@Test
+	@DisplayName("GET /api/triples?hypotenuse_squared=1 returns an empty object")
 	void testGetTriples_EmptyResult() throws Exception {
 		when(service.getTriples(1)).thenReturn(Optional.empty());
 
@@ -51,6 +54,7 @@ public class PythatripleControllerTest {
 	}
 
 	@Test
+	@DisplayName("GET /api/triples?hypotenuse_squared=-25 returns a 400 error")
 	void testGetTriples_InvalidParameter() throws Exception {
 		mvc.perform(get("/api/triples?hypotenuse_squared=-25"))
 			.andExpect(status().isBadRequest())
@@ -58,6 +62,15 @@ public class PythatripleControllerTest {
 	}
 
 	@Test
+	@DisplayName("GET /api/triples?hypotenuse_squared= returns a 400 error")
+	void testGetTriples_NoParameter() throws Exception {
+		mvc.perform(get("/api/triples?hypotenuse_squared="))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.hypotenuse_squared").exists());
+	}
+
+	@Test
+	@DisplayName("GET /api/triples lists all calculated valid triples")
 	void shouldReturnAllTriples() throws Exception {
 		when(service.getAllTriples()).thenReturn(List.of(
 			new PythatripleTableResponse(25, 3, 4, 5, 4.0),
@@ -66,6 +79,7 @@ public class PythatripleControllerTest {
 
 		mvc.perform(get("/api/triples"))
 			.andExpect(status().isOk())
+			.andExpect(jsonPath("$").isArray())
 			.andExpect(jsonPath("$.length()").value(2))
 			.andExpect(jsonPath("$[0].hypotSq").value(25))
 			.andExpect(jsonPath("$[1].avg").value(8.0));

@@ -1,11 +1,15 @@
 package com.example.pythatriple_web_api;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.util.Optional;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
@@ -41,54 +45,63 @@ class PythatripleServiceTest {
 		assertEquals(avg, r.avg());
 	}
 
-	@Test
-	void testValidTriple_25() {
+	@ParameterizedTest(name = "hypotSq {0}: {1}² + {2}² = {3}² (avg={4})")
+	@CsvSource({
+		"25,3,4,5,4.0",
+		"100,6,8,10,8.0",
+		"2147395600,27804,37072,46340,37072.0",
+	})
+	void testValidTriples(
+		int hypotSq, int a, int b, int c, double avg
+	) {
 		assertValidTriple(
-			service.getTriples(25),
-			3, 4, 5, 4.0
+			service.getTriples(hypotSq),
+			a, b, c, avg
+		);
+	}
+
+	@ParameterizedTest(name = "hypotSq {0}: no triples, return empty result")
+	@CsvSource({"1", "2147483647"})
+	void testEmptyResult(int hypotSq) {
+		assertTrue(service.getTriples(hypotSq).isEmpty());
+	}
+
+	@ParameterizedTest(name = "hypotSq {0}: non-positive, throw exception")
+	@CsvSource({"0", "-25"})
+	void testNonPositive(int hypotSq) {
+		assertThrows(
+			IllegalArgumentException.class,
+			() -> service.getTriples(hypotSq)
 		);
 	}
 
 	@Test
-	void testValidTriple_100() {
-		assertValidTriple(
-			service.getTriples(100),
-			6, 8, 10, 8.0
-		);
-	}
-
-	@Test
-	void testValidTriple_Large() {
-		assertValidTriple(
-			service.getTriples(2147395600),
-			27804, 37072, 46340, 37072.0
-		);
-	}
-
-	@Test
-	void testEmptyResult() {
-		assertTrue(service.getTriples(1).isEmpty());
-		assertTrue(service.getTriples(2147483647).isEmpty());
-	}
-
-	@Test
-	void testNonPositive() {
-		assertThrows(IllegalArgumentException.class, () -> service.getTriples(0));
-		assertThrows(IllegalArgumentException.class, () -> service.getTriples(-1));
-	}
-
-	@Test
+	@DisplayName("Calculate triples for the same hypotSq only once, and ensure no dupes in database")
 	void testCaching() {
-		assertValidTriple(
-			service.getTriples(25),
-			3, 4, 5, 4.0
-		);
 		assertValidTriple(
 			service.getTriples(25),
 			3, 4, 5, 4.0
 		);
 
 		verify(repository, times(1))
+			.save(any(PythatripleResult.class));
+
+		assertValidTriple(
+			service.getTriples(25),
+			3, 4, 5, 4.0
+		);
+
+		verify(repository, times(1))
+			.save(any(PythatripleResult.class));
+
+		service.getTriples(1);
+
+		verify(repository, times(2))
+			.save(any(PythatripleResult.class));
+
+		service.getTriples(1);
+
+		verify(repository, times(2))
 			.save(any(PythatripleResult.class));
 	}
 
@@ -104,6 +117,7 @@ class PythatripleServiceTest {
 	}
 
 	@Test
+	@DisplayName("getAllTriples: list calculated triples in reverse insertion order, with only valid triples and no dupes")
 	void testGetAllTriples() {
 		service.getTriples(25);
 		service.getTriples(1);
