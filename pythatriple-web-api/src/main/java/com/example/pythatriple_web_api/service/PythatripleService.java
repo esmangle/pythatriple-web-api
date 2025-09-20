@@ -9,10 +9,18 @@ import com.example.pythatriple_web_api.dto.PythatripleResponse;
 @Service
 public class PythatripleService {
 	public PythatripleResponse getTriples(int hypotSq) {
+		if (hypotSq <= 0) {
+			throw new IllegalArgumentException(
+				"hypotSq must be a positive integer, but was: " + hypotSq
+			);
+		}
+
 		return calculateTriples(hypotSq);
 	}
 
 	private PythatripleResponse calculateTriples(int hypotSq) {
+		assert hypotSq > 0 : "hypotSq must be a positive integer";
+
 		double cDouble = Math.sqrt(hypotSq);
 
 		int c = (int) Math.round(cDouble);
