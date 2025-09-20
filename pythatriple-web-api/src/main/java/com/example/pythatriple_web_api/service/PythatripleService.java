@@ -2,12 +2,18 @@ package com.example.pythatriple_web_api.service;
 
 import java.util.Comparator;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.pythatriple_web_api.dto.PythatripleResponse;
+import com.example.pythatriple_web_api.model.PythatripleResult;
+import com.example.pythatriple_web_api.repository.PythatripleResultRepository;
 
 @Service
 public class PythatripleService {
+	@Autowired
+	private PythatripleResultRepository repository;
+
 	public PythatripleResponse getTriples(int hypotSq) {
 		if (hypotSq <= 0) {
 			throw new IllegalArgumentException(
@@ -15,7 +21,27 @@ public class PythatripleService {
 			);
 		}
 
-		return calculateTriples(hypotSq);
+		var cached = repository.findByHypotSq(hypotSq);
+
+		if (cached.isPresent()) {
+			var result = cached.get();
+
+			return new PythatripleResponse(
+				result.getA(), result.getB(), result.getC(), result.getAvg()
+			);
+		}
+
+		var resp = calculateTriples(hypotSq);
+
+		var result = resp == null
+			? new PythatripleResult(hypotSq)
+			: new PythatripleResult(
+				hypotSq, resp.a(), resp.b(), resp.c(), resp.avg()
+			);
+
+		repository.save(result);
+
+		return resp;
 	}
 
 	private PythatripleResponse calculateTriples(int hypotSq) {
