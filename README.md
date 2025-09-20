@@ -1,26 +1,11 @@
 spring boot backend + frontend example project, developed with VS Code on Debian Linux
 
-## Database Schema
-
-```sql
-CREATE TABLE IF NOT EXISTS triple_results (
-    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    hypotenuse_squared INT UNSIGNED NOT NULL UNIQUE,
-    leg_a INT UNSIGNED NULL,
-    leg_b INT UNSIGNED NULL,
-    hypotenuse INT UNSIGNED NULL,
-    average DOUBLE NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-## Web API (Back-end)
-
 Technologies used:
 * Spring Boot 3.5.6
 * Java 21
 * MySQL database
 * Maven build tool
+* Bootstrap 5.3.3
 
 ### How to run
 
@@ -29,7 +14,7 @@ Download source code:
 git https://github.com/esmangle/pythatriple-web-api.git
 ```
 
-Run Web API:
+Run app:
 ```bash
 cd pythatriple-web-api
 DB_USER="admin" DB_PASS="password" ./mvnw spring-boot:run
@@ -40,6 +25,12 @@ Run tests:
 cd pythatriple-web-api
 ./mvnw test
 ```
+
+## Web App (Front-end)
+
+tba
+
+## Web API (Back-end)
 
 ### API Endpoints
 
@@ -102,4 +93,16 @@ $ curl "http://localhost:8080/api/triples"
 [{"hypotSq":100,"a":6,"b":8,"c":10,"avg":8.0},{"hypotSq":25,"a":3,"b":4,"c":5,"avg":4.0}]
 ```
 
-## Web App (Front-end)
+## Database Schema
+
+```sql
+CREATE TABLE IF NOT EXISTS triple_results (
+    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    hypotenuse_squared INT UNSIGNED NOT NULL UNIQUE,
+    leg_a INT UNSIGNED NULL,
+    leg_b INT UNSIGNED NULL,
+    hypotenuse INT UNSIGNED NULL,
+    average DOUBLE NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+```
