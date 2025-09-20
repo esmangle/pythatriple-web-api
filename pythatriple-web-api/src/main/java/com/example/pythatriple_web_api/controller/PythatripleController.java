@@ -41,10 +41,10 @@ public class PythatripleController {
 			return ResponseEntity.badRequest().body(errors);
 		}
 
-		var result = service.getTriples(req.hypotenuse_squared());
+		var resp = service.getTriples(req.hypotenuse_squared());
 
 		return ResponseEntity.ok().body(
-			(result == null) ? Map.of() : result
+			resp.isPresent() ? resp.get() : Map.of()
 		);
 	}
 }

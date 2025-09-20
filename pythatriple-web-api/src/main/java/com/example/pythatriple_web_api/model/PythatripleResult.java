@@ -75,4 +75,12 @@ public class PythatripleResult {
 	public Integer getC() { return c; }
 	public Double getAvg() { return avg; }
 	public LocalDateTime getTimestamp() { return timestamp; }
+
+	public boolean isValid() {
+		return a != null && b != null && c != null && avg != null;
+	}
+
+	public boolean isEmpty() {
+		return !isValid();
+	}
 }

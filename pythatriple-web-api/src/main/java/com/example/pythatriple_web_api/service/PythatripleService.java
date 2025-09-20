@@ -1,6 +1,7 @@
 package com.example.pythatriple_web_api.service;
 
 import java.util.Comparator;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,7 +15,7 @@ public class PythatripleService {
 	@Autowired
 	private PythatripleResultRepository repository;
 
-	public PythatripleResponse getTriples(int hypotSq) {
+	public Optional<PythatripleResponse> getTriples(int hypotSq) {
 		if (hypotSq <= 0) {
 			throw new IllegalArgumentException(
 				"hypotSq must be a positive integer, but was: " + hypotSq
@@ -26,9 +27,13 @@ public class PythatripleService {
 		if (cached.isPresent()) {
 			var result = cached.get();
 
-			return new PythatripleResponse(
+			if (result.isEmpty()) {
+				return Optional.empty();
+			}
+
+			return Optional.of(new PythatripleResponse(
 				result.getA(), result.getB(), result.getC(), result.getAvg()
-			);
+			));
 		}
 
 		var resp = calculateTriples(hypotSq);
@@ -41,7 +46,7 @@ public class PythatripleService {
 
 		repository.save(result);
 
-		return resp;
+		return Optional.ofNullable(resp);
 	}
 
 	private PythatripleResponse calculateTriples(int hypotSq) {
