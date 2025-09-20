@@ -1,7 +1,9 @@
 package com.example.pythatriple_web_api.service;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,16 @@ import com.example.pythatriple_web_api.repository.PythatripleResultRepository;
 public class PythatripleService {
 	@Autowired
 	private PythatripleResultRepository repository;
+
+	public List<PythatripleResponse> getAllTriples() {
+		return repository.findAllByOrderByTimestampDesc()
+			.stream()
+			.filter(PythatripleResult::isValid)
+			.map(result -> new PythatripleResponse(
+				result.getA(), result.getB(), result.getC(), result.getAvg()
+			))
+			.collect(Collectors.toList());
+	}
 
 	public Optional<PythatripleResponse> getTriples(int hypotSq) {
 		if (hypotSq <= 0) {

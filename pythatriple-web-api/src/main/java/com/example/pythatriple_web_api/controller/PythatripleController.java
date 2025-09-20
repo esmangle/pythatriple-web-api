@@ -26,6 +26,11 @@ public class PythatripleController {
 	private PythatripleService service;
 
 	@GetMapping("triples")
+	public ResponseEntity<?> getAllTriples() {
+		return ResponseEntity.ok(service.getAllTriples());
+	}
+
+	@GetMapping(value = "triples", params = "hypotenuse_squared")
 	public ResponseEntity<?> getTriples(
 		@Valid @ModelAttribute PythatripleRequest req,
 		BindingResult br
