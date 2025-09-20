@@ -1,0 +1,12 @@
+CREATE DATABASE IF NOT EXISTS pythatriple_db;
+USE pythatriple_db;
+
+CREATE TABLE IF NOT EXISTS triple_results (
+    id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    hypotenuse_squared INT UNSIGNED NOT NULL UNIQUE,
+    leg_a INT UNSIGNED NULL,
+    leg_b INT UNSIGNED NULL,
+    hypotenuse INT UNSIGNED NULL,
+    average DOUBLE NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
