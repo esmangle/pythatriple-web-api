@@ -175,7 +175,7 @@
 			row.classList.add("col", "mono");
 
 			[
-				hypotSq, data.a, data.b, data.c, data.avg.toFixed(2)
+				hypotSq, data.a, data.b, data.c, numFormat.format(data.avg)
 			].map(val => {
 				const td = document.createElement("td");
 				td.textContent = val;
