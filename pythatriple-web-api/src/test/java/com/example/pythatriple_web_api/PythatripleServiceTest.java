@@ -36,14 +36,14 @@ class PythatripleServiceTest {
 
 	private static void assertValidTriple(
 		Optional<PythatripleResponse> res,
-		int a, int b, int c, double avg
+		int hypotSq, int a, int b, int c, double avg
 	) {
-		assertTrue(res.isPresent());
+		assertTrue(res.isPresent(), "valid triple isn't for hypotSq " + hypotSq);
 		var r = res.get();
-		assertEquals(a, r.a());
-		assertEquals(b, r.b());
-		assertEquals(c, r.c());
-		assertEquals(avg, r.avg(), 0.001);
+		assertEquals(a, r.a(), "leg A is incorrect for hypotSq " + hypotSq);
+		assertEquals(b, r.b(), "leg B is incorrect for hypotSq " + hypotSq);
+		assertEquals(c, r.c(), "hypotenuse is incorrect for hypotSq " + hypotSq);
+		assertEquals(avg, r.avg(), 0.001, "average is incorrect for hypotSq " + hypotSq);
 	}
 
 	@ParameterizedTest(name = "hypotSq {0}: {1}² + {2}² = {3}² (avg={4})")
@@ -61,7 +61,7 @@ class PythatripleServiceTest {
 
 		assertValidTriple(
 			service.getTriples(hypotSq),
-			a, b, c, avg
+			hypotSq, a, b, c, avg
 		);
 	}
 
@@ -71,7 +71,10 @@ class PythatripleServiceTest {
 		doReturn(Optional.empty()).when(repository).findByHypotSq(any());
 		doAnswer(i -> i.getArgument(0)).when(repository).save(any());
 
-		assertTrue(service.getTriples(hypotSq).isEmpty());
+		assertTrue(
+			service.getTriples(hypotSq).isEmpty(),
+			"hypotSq " + hypotSq + " should not have a valid triple"
+		);
 	}
 
 	@ParameterizedTest(name = "hypotSq {0}: non-positive, throw exception")
@@ -85,11 +88,10 @@ class PythatripleServiceTest {
 
 	@Test
 	@DisplayName("Calculate triples for the same hypotSq only once, and ensure no dupes in database")
-	//
 	void testCaching() {
 		assertValidTriple(
 			service.getTriples(25),
-			3, 4, 5, 4.0
+			25, 3, 4, 5, 4.0
 		);
 
 		verify(repository, times(1))
@@ -97,7 +99,7 @@ class PythatripleServiceTest {
 
 		assertValidTriple(
 			service.getTriples(25),
-			3, 4, 5, 4.0
+			25, 3, 4, 5, 4.0
 		);
 
 		verify(repository, times(1))
@@ -135,11 +137,11 @@ class PythatripleServiceTest {
 		service.getTriples(1);
 		service.getTriples(25);
 
-		var table = service.getAllTriples();
+		var list = service.getAllTriples();
 
-		assertEquals(2, table.size());
-		assertTableRow(table.get(0), 169, 5, 12, 13, 10.0);
-		assertTableRow(table.get(1), 25, 3, 4, 5, 4.0);
+		assertEquals(2, list.size(), "more list elements than expected");
+		assertTableRow(list.get(0), 169, 5, 12, 13, 10.0);
+		assertTableRow(list.get(1), 25, 3, 4, 5, 4.0);
 
 		verify(repository, times(3))
 			.save(any(PythatripleResult.class));
@@ -172,7 +174,10 @@ class PythatripleServiceTest {
 			count, 46340, endTime - startTime
 		);
 
-		assertEquals(count, 31333);
+		assertEquals(
+			count, 31333,
+			"there should be exactly 31333 valid triples between 1^2 to 46340^2"
+		);
 	}
 
 	@AfterEach
