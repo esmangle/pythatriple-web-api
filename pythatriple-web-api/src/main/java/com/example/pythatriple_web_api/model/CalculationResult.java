@@ -1,8 +1,10 @@
 package com.example.pythatriple_web_api.model;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.NaturalId;
 
 import jakarta.persistence.*;
 
@@ -15,6 +17,7 @@ public class CalculationResult {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@NaturalId
 	@Column(
 		name = "hypotenuse_squared", nullable = false, unique = true,
 		columnDefinition = "INT UNSIGNED"
@@ -30,7 +33,7 @@ public class CalculationResult {
 
 	@CreationTimestamp
 	@Column(
-		name = "created_at", nullable = false, updatable = false,
+		name = "calculated_at", nullable = false, updatable = false,
 		columnDefinition = "TIMESTAMP"
 	)
 	private LocalDateTime timestamp;
@@ -56,5 +59,17 @@ public class CalculationResult {
 
 	public boolean isEmpty() {
 		return !isValid();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		return Objects.equals(hypotSq, ((CalculationResult) o).hypotSq);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(hypotSq);
 	}
 }
