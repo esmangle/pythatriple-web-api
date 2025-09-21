@@ -60,7 +60,7 @@ class PythatripleServiceTest {
 		doAnswer(i -> i.getArgument(0)).when(repository).save(any());
 
 		assertValidTriple(
-			service.getTriples(hypotSq),
+			service.getTriple(hypotSq),
 			hypotSq, a, b, c, avg
 		);
 	}
@@ -72,7 +72,7 @@ class PythatripleServiceTest {
 		doAnswer(i -> i.getArgument(0)).when(repository).save(any());
 
 		assertTrue(
-			service.getTriples(hypotSq).isEmpty(),
+			service.getTriple(hypotSq).isEmpty(),
 			"hypotSq " + hypotSq + " should not have a valid triple"
 		);
 	}
@@ -82,7 +82,7 @@ class PythatripleServiceTest {
 	void testNonPositive(int hypotSq) {
 		assertThrows(
 			IllegalArgumentException.class,
-			() -> service.getTriples(hypotSq)
+			() -> service.getTriple(hypotSq)
 		);
 	}
 
@@ -90,7 +90,7 @@ class PythatripleServiceTest {
 	@DisplayName("Calculate triples for the same hypotSq only once, and ensure no dupes in database")
 	void testCaching() {
 		assertValidTriple(
-			service.getTriples(25),
+			service.getTriple(25),
 			25, 3, 4, 5, 4.0
 		);
 
@@ -98,19 +98,19 @@ class PythatripleServiceTest {
 			.save(any(PythatripleResult.class));
 
 		assertValidTriple(
-			service.getTriples(25),
+			service.getTriple(25),
 			25, 3, 4, 5, 4.0
 		);
 
 		verify(repository, times(1))
 			.save(any(PythatripleResult.class));
 
-		service.getTriples(1);
+		service.getTriple(1);
 
 		verify(repository, times(2))
 			.save(any(PythatripleResult.class));
 
-		service.getTriples(1);
+		service.getTriple(1);
 
 		verify(repository, times(2))
 			.save(any(PythatripleResult.class));
@@ -130,12 +130,12 @@ class PythatripleServiceTest {
 	@Test
 	@DisplayName("getAllTriples: list calculated triples in reverse insertion order, with only valid triples and no dupes")
 	void testGetAllTriples() {
-		service.getTriples(25);
-		service.getTriples(1);
-		service.getTriples(169);
-		service.getTriples(169);
-		service.getTriples(1);
-		service.getTriples(25);
+		service.getTriple(25);
+		service.getTriple(1);
+		service.getTriple(169);
+		service.getTriple(169);
+		service.getTriple(1);
+		service.getTriple(25);
 
 		var list = service.getAllTriples();
 
@@ -158,7 +158,7 @@ class PythatripleServiceTest {
 		int count = 0;
 
 		for (int c = 1; c <= 46340; c++) {
-			var res = service.getTriples(c * c);
+			var res = service.getTriple(c * c);
 
 			if (res.isPresent()) {
 				assertEquals(c, res.get().c());

@@ -31,7 +31,7 @@ public class PythatripleControllerTest {
 	@Test
 	@DisplayName("GET /api/triples?hypotenuse_squared=25 returns a valid triple")
 	void testGetTriples_ValidTriple() throws Exception {
-		when(service.getTriples(25)).thenReturn(
+		when(service.getTriple(25)).thenReturn(
 			Optional.of(new PythatripleResponse(3, 4, 5, 4.0))
 		);
 
@@ -46,7 +46,7 @@ public class PythatripleControllerTest {
 	@Test
 	@DisplayName("GET /api/triples?hypotenuse_squared=1 returns an empty object")
 	void testGetTriples_EmptyResult() throws Exception {
-		when(service.getTriples(1)).thenReturn(Optional.empty());
+		when(service.getTriple(1)).thenReturn(Optional.empty());
 
 		mvc.perform(get("/api/triples?hypotenuse_squared=1"))
 			.andExpect(status().isOk())

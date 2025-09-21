@@ -28,7 +28,7 @@ public class PythatripleService {
 			.collect(Collectors.toList());
 	}
 
-	public Optional<PythatripleResponse> getTriples(int hypotSq) {
+	public Optional<PythatripleResponse> getTriple(int hypotSq) {
 		if (hypotSq <= 0) {
 			throw new IllegalArgumentException(
 				"hypotSq must be a positive integer, but was: " + hypotSq
@@ -49,7 +49,7 @@ public class PythatripleService {
 			));
 		}
 
-		var resp = calculateTriples(hypotSq);
+		var resp = calculateTriple(hypotSq);
 
 		var result = resp == null
 			? new PythatripleResult(hypotSq)
@@ -62,7 +62,7 @@ public class PythatripleService {
 		return Optional.ofNullable(resp);
 	}
 
-	private PythatripleResponse calculateTriples(int hypotSq) {
+	private PythatripleResponse calculateTriple(int hypotSq) {
 		assert hypotSq > 0 : "hypotSq must be a positive integer";
 
 		double cDouble = Math.sqrt(hypotSq);

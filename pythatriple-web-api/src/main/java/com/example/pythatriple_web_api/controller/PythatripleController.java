@@ -31,7 +31,7 @@ public class PythatripleController {
 	}
 
 	@GetMapping(value = "triples", params = "hypotenuse_squared")
-	public ResponseEntity<?> getTriples(
+	public ResponseEntity<?> getTriple(
 		@Valid @ModelAttribute PythatripleRequest req,
 		BindingResult br
 	) {
@@ -46,7 +46,7 @@ public class PythatripleController {
 			return ResponseEntity.badRequest().body(errors);
 		}
 
-		var resp = service.getTriples(req.hypotenuse_squared());
+		var resp = service.getTriple(req.hypotenuse_squared());
 
 		return ResponseEntity.ok().body(
 			resp.isPresent() ? resp.get() : Map.of()
