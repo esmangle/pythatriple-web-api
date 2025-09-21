@@ -56,6 +56,9 @@
 		const button = document.getElementById("buttonSubmit");
 		const spinner = document.getElementById("spinnerSubmit");
 		const statusMsg = document.getElementById("statusMessage");
+		const resultsTable = document.getElementById("resultsTable");
+
+		const triplesMap = {};
 
 		let submissionDisabled = false;
 
@@ -115,6 +118,8 @@
 					return;
 				}
 
+				prependToTable(hypotSq, data);
+
 				const msg = `Success: ${hypotSq} = ${data.a}² + ${data.b}² = ${data.c}² (average: ${numFormat.format(data.avg)})`;
 
 				updateStatus(() => {
@@ -142,6 +147,28 @@
 				.then(okFn)
 				.catch(errFn)
 				.finally(finallyFn);
+		}
+
+		function prependToTable(hypotSq, data) {
+			if (hypotSq in triplesMap) {
+				return;
+			}
+
+			triplesMap[hypotSq] = data;
+
+			const row = document.createElement("tr");
+
+			row.classList.add("col", "mono");
+
+			[
+				hypotSq, data.a, data.b, data.c, data.avg.toFixed(2)
+			].map(val => {
+				const td = document.createElement("td");
+				td.textContent = val;
+				return td;
+			}).forEach(td => row.appendChild(td));
+
+			resultsTable.prepend(row);
 		}
 
 		function showStatus(msg, type) {
@@ -212,20 +239,6 @@
 						</tr>
 					</thead>
 					<tbody id="resultsTable" class="text-center">
-						<tr>
-							<td class="col mono">25</td>
-							<td class="col mono">3</td>
-							<td class="col mono">4</td>
-							<td class="col mono">5</td>
-							<td class="col mono">4.0</td>
-						</tr>
-						<tr>
-							<td class="col mono">2147302921</td>
-							<td class="col mono">15861</td>
-							<td class="col mono">43540</td>
-							<td class="col mono">46339</td>
-							<td class="col mono">35246.67</td>
-						</tr>
 					</tbody>
 				</table>
 			</div>
