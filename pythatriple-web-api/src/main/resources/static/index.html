@@ -13,18 +13,26 @@
 			margin-top: 0.5rem;
 			font-weight: 500;
 		}
-		.status-success {
+		.status-info {
+			color: #b6effb;
+			background-color: #b6effb1a;
+			border: 1px solid #b6effb;
+		}
+		.status-ok {
 			color: #4caf50;
-			background-color: rgba(76, 175, 80, 0.1);
+			background-color: #4caf501a;
 			border: 1px solid #4caf50;
 		}
-		.status-error {
+		.status-fail {
 			color: #f44336;
-			background-color: rgba(244, 67, 54, 0.1);
+			background-color: #f443361a;
 			border: 1px solid #f44336;
 		}
 		.mono {
 			font-family: monospace;
+		}
+		.mono::placeholder {
+			font-family: sans-serif;
 		}
 	</style>
 	<script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -32,11 +40,31 @@
 	document.addEventListener("DOMContentLoaded", function() {
 		"use strict";
 
-		const statusMessage = document.getElementById("statusMessage");
+		const form = document.getElementById("formHypotSq");
+		const input = document.getElementById("inputHypotSq");
+		const button = document.getElementById("buttonSubmit");
+		const statusMsg = document.getElementById("statusMessage");
 
-		statusMessage.textContent = "Success: 25 = 3² + 4² = 5² (average: 4.0)";
-		statusMessage.classList.add("status-success");
-		statusMessage.style.display = "block";
+		form.addEventListener("submit", function(e) {
+			e.preventDefault();
+
+			button.disabled = true;
+
+			statusMessage.textContent = "Finding triples for squared hypotenuse 25...";
+			statusMessage.classList.remove("status-info", "status-ok", "status-fail");
+			statusMessage.classList.add("status-info");
+			statusMessage.style.display = "block";
+
+			setTimeout(function() {
+				statusMessage.textContent = "Success: 25 = 3² + 4² = 5² (average: 4.0)";
+				//statusMessage.textContent = "Fail: No pythagorean triples found for 25";
+				statusMessage.classList.remove("status-info", "status-ok", "status-fail");
+				statusMessage.classList.add("status-fail");
+				statusMessage.style.display = "block";
+
+				button.disabled = false;
+			}, 1000);
+		});
 	});
 	</script>
 </head>
@@ -44,13 +72,14 @@
 	<div class="container mt-5">
 		<h1 class="text-center mb-4">Pythagorean Triple Finder</h1>
 
-		<form class="row justify-content-center mb-4">
+		<form id="formHypotSq" class="row justify-content-center mb-4">
 			<div class="col-md-6">
 				<div class="input-group">
-					<input type="text" class="form-control"
+					<input id="inputHypotSq" type="text" class="form-control mono"
 						placeholder="Enter a squared hypotenuse (example: 25, 100, 169)"
-						pattern="[0-9]*" required onkeypress="return /\d/.test(event.key)">
-					<button class="btn btn-primary" type="submit">Check</button>
+						pattern="[0-9]*" required
+						onkeypress="return event.key === 'Enter' || /\d/.test(event.key)">
+					<button id="buttonSubmit" class="btn btn-primary" type="submit">Submit</button>
 				</div>
 				<div id="statusMessage" class="status-message mt-4"></div>
 			</div>
