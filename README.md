@@ -30,7 +30,11 @@ cd pythatriple-web-api
 
 ## Web App (Front-end)
 
-tba
+<img width="690" height="480" alt="image" src="https://github.com/user-attachments/assets/bc675e93-1710-415e-8ecc-a6faa418b350" />
+
+Submitting an input number will immediately prepend results to the table
+
+All results from the database are listed under the table in reverse insertion order on page load
 
 ## Web API (Back-end)
 
