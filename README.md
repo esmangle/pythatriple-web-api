@@ -26,6 +26,8 @@ cd pythatriple-web-api
 ./mvnw test
 ```
 
+(test uses in-mem db, so no login needed)
+
 ## Web App (Front-end)
 
 tba
@@ -54,10 +56,16 @@ tba
 { "a": 3, "b": 4, "c": 5, "avg": 4.0 }
 ```
 
+Calculates a pythagorean triple for the input parameter `hypotenuse_squared`, which must be a positive integer
+
+Returns an empty json object if the input number is not a perfect square or if no triple could be found
+
+If multiple triples are found, primitive triples are prioritized over non-primitives, and higher average is prioritized
+
 ### Example usage
 
 25 = 3² + 4² = 5²\
-average: (3 + 4 + 5) / 3 = 4.0
+average: (3 + 4 + 5) / 3.0 = 4.0
 
 ```bash
 $ curl "http://localhost:8080/api/triples?hypotenuse_squared=25"
@@ -78,19 +86,19 @@ $ curl "http://localhost:8080/api/triples?hypotenuse_squared=1"
 {}
 ```
 
-100 = 6² + 8² = 10²\
-average: (6 + 8 + 10) / 3 = 8.0
+169 = 5² + 12² = 13²\
+average: (5 + 12 + 13) / 3.0 = 10.0
 
 ```bash
-$ curl "http://localhost:8080/api/triples?hypotenuse_squared=100"
-{"a":6,"b":8,"c":10,"avg":8.0}
+$ curl "http://localhost:8080/api/triples?hypotenuse_squared=169"
+{"a":5,"b":12,"c":13,"avg":10.0}
 ```
 
 Lists calculated triples in reverse insertion order
 
 ```bash
 $ curl "http://localhost:8080/api/triples"
-[{"hypotSq":100,"a":6,"b":8,"c":10,"avg":8.0},{"hypotSq":25,"a":3,"b":4,"c":5,"avg":4.0}]
+[{"hypotSq":169,"a":5,"b":12,"c":13,"avg":10.0},{"hypotSq":25,"a":3,"b":4,"c":5,"avg":4.0}]
 ```
 
 ## Database Schema
