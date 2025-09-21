@@ -48,7 +48,7 @@
 		"use strict";
 
 		const numFormat = new Intl.NumberFormat("en", {
-			minimumFractionDigits: 1, maximumFractionDigits: 2,
+			minimumFractionDigits: 1, maximumFractionDigits: 2, useGrouping: false
 		});
 
 		const form = document.getElementById("formHypotSq");
@@ -61,9 +61,7 @@
 		const triplesMap = {};
 
 		getAllTriples(list => {
-			list.forEach(data => {
-				prependToTable(data.hypotSq, data);
-			});
+			prependListToTable(list);
 		}, error => {
 			console.error("Error loading triples:", error);
 			showStatus(`Error loading table: ${error.message}`, "fail");
@@ -171,13 +169,7 @@
 				.finally(finallyFn);
 		}
 
-		function prependToTable(hypotSq, data) {
-			if (hypotSq in triplesMap) {
-				return;
-			}
-
-			triplesMap[hypotSq] = data;
-
+		function createRow(hypotSq, data) {
 			const row = document.createElement("tr");
 
 			row.classList.add("col", "mono");
@@ -190,7 +182,35 @@
 				return td;
 			}).forEach(td => row.appendChild(td));
 
-			resultsTable.prepend(row);
+			return row;
+		}
+
+		function prependToTable(hypotSq, data) {
+			if (hypotSq in triplesMap) {
+				return;
+			}
+
+			triplesMap[hypotSq] = data;
+
+			resultsTable.prepend(createRow(hypotSq, data));
+		}
+
+		function prependListToTable(list) {
+			const frag = document.createDocumentFragment();
+
+			for (const data of list) {
+				const hypotSq = data.hypotSq;
+
+				if (hypotSq in triplesMap) {
+					continue;
+				}
+
+				triplesMap[hypotSq] = data;
+
+				frag.append(createRow(hypotSq, data));
+			}
+
+			resultsTable.prepend(frag);
 		}
 
 		function showStatus(msg, type) {
