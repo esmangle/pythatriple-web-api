@@ -20,8 +20,8 @@ import jakarta.transaction.Transactional;
 
 import com.example.pythatriple_web_api.dto.PythatripleResponse;
 import com.example.pythatriple_web_api.dto.PythatripleTableResponse;
-import com.example.pythatriple_web_api.model.PythatripleResult;
-import com.example.pythatriple_web_api.repository.PythatripleResultRepository;
+import com.example.pythatriple_web_api.repository.CalculationResultRepository;
+import com.example.pythatriple_web_api.repository.TripleResultRepository;
 import com.example.pythatriple_web_api.service.PythatripleService;
 
 @SpringBootTest
@@ -32,7 +32,10 @@ class PythatripleServiceTest {
 	private PythatripleService service;
 
 	@MockitoSpyBean
-	private PythatripleResultRepository repository;
+	private CalculationResultRepository calcRepo;
+
+	@MockitoSpyBean
+	private TripleResultRepository tripleRepo;
 
 	private static void assertValidTriple(
 		Optional<PythatripleResponse> res,
@@ -46,6 +49,24 @@ class PythatripleServiceTest {
 		assertEquals(avg, r.avg(), 0.001, "average is incorrect for hypotSq " + hypotSq);
 	}
 
+	private static void assertTableRow(
+		PythatripleTableResponse row,
+		int hypotSq, int a, int b, int c, double avg
+	) {
+		assertEquals(hypotSq, row.hypotSq());
+		assertEquals(a, row.a());
+		assertEquals(b, row.b());
+		assertEquals(c, row.c());
+		assertEquals(avg, row.avg(), 0.001);
+	}
+
+	private void stubRepositories() {
+		doReturn(Optional.empty()).when(calcRepo).findByHypotSq(any());
+		doAnswer(i -> i.getArgument(0)).when(calcRepo).save(any());
+		doReturn(Optional.empty()).when(tripleRepo).findByAAndBAndC(any(), any(), any());
+		doAnswer(i -> i.getArgument(0)).when(tripleRepo).save(any());
+	}
+
 	@ParameterizedTest(name = "hypotSq {0}: {1}² + {2}² = {3}² (avg={4})")
 	@CsvSource({
 		"25,3,4,5,4.0", // smallest pythagorean triple
@@ -56,8 +77,7 @@ class PythatripleServiceTest {
 	void testValidTriples(
 		int hypotSq, int a, int b, int c, double avg
 	) {
-		doReturn(Optional.empty()).when(repository).findByHypotSq(any());
-		doAnswer(i -> i.getArgument(0)).when(repository).save(any());
+		stubRepositories();
 
 		assertValidTriple(
 			service.getTriple(hypotSq),
@@ -68,8 +88,7 @@ class PythatripleServiceTest {
 	@ParameterizedTest(name = "hypotSq {0}: no triples, return empty result")
 	@CsvSource({"1", "2147483647"})
 	void testEmptyResult(int hypotSq) {
-		doReturn(Optional.empty()).when(repository).findByHypotSq(any());
-		doAnswer(i -> i.getArgument(0)).when(repository).save(any());
+		stubRepositories();
 
 		assertTrue(
 			service.getTriple(hypotSq).isEmpty(),
@@ -80,6 +99,8 @@ class PythatripleServiceTest {
 	@ParameterizedTest(name = "hypotSq {0}: non-positive, throw exception")
 	@CsvSource({"0", "-25"})
 	void testNonPositive(int hypotSq) {
+		//stubRepositories();
+
 		assertThrows(
 			IllegalArgumentException.class,
 			() -> service.getTriple(hypotSq)
@@ -94,37 +115,26 @@ class PythatripleServiceTest {
 			25, 3, 4, 5, 4.0
 		);
 
-		verify(repository, times(1))
-			.save(any(PythatripleResult.class));
+		verify(calcRepo, times(1)).save(any());
+		verify(tripleRepo, times(1)).save(any());
 
 		assertValidTriple(
 			service.getTriple(25),
 			25, 3, 4, 5, 4.0
 		);
 
-		verify(repository, times(1))
-			.save(any(PythatripleResult.class));
+		verify(calcRepo, times(1)).save(any());
+		verify(tripleRepo, times(1)).save(any());
 
 		service.getTriple(1);
 
-		verify(repository, times(2))
-			.save(any(PythatripleResult.class));
+		verify(calcRepo, times(2)).save(any());
+		verify(tripleRepo, times(1)).save(any());
 
 		service.getTriple(1);
 
-		verify(repository, times(2))
-			.save(any(PythatripleResult.class));
-	}
-
-	private static void assertTableRow(
-		PythatripleTableResponse row,
-		int hypotSq, int a, int b, int c, double avg
-	) {
-		assertEquals(hypotSq, row.hypotSq());
-		assertEquals(a, row.a());
-		assertEquals(b, row.b());
-		assertEquals(c, row.c());
-		assertEquals(avg, row.avg(), 0.001);
+		verify(calcRepo, times(2)).save(any());
+		verify(tripleRepo, times(1)).save(any());
 	}
 
 	@Test
@@ -143,15 +153,14 @@ class PythatripleServiceTest {
 		assertTableRow(list.get(0), 169, 5, 12, 13, 10.0);
 		assertTableRow(list.get(1), 25, 3, 4, 5, 4.0);
 
-		verify(repository, times(3))
-			.save(any(PythatripleResult.class));
+		verify(calcRepo, times(3)).save(any());
+		verify(tripleRepo, times(2)).save(any());
 	}
 
 	@Test
 	@DisplayName("Test all possible input integers to verify completeness and also performance")
 	void testTotal() {
-		doReturn(Optional.empty()).when(repository).findByHypotSq(any());
-		doAnswer(i -> i.getArgument(0)).when(repository).save(any());
+		stubRepositories();
 
 		long startTime = System.currentTimeMillis();
 
@@ -182,11 +191,13 @@ class PythatripleServiceTest {
 
 	@AfterEach
 	void afterEach() {
-		reset(repository);
+		reset(calcRepo);
+		reset(tripleRepo);
 	}
 
 	@AfterTransaction
 	void afterTrans() {
-		assertEquals(0L, repository.count());
+		assertEquals(0L, calcRepo.count());
+		assertEquals(0L, tripleRepo.count());
 	}
 }
