@@ -10,21 +10,30 @@ import org.springframework.stereotype.Service;
 
 import com.example.pythatriple_web_api.dto.PythatripleResponse;
 import com.example.pythatriple_web_api.dto.PythatripleTableResponse;
-import com.example.pythatriple_web_api.model.PythatripleResult;
-import com.example.pythatriple_web_api.repository.PythatripleResultRepository;
+import com.example.pythatriple_web_api.model.CalculationResult;
+import com.example.pythatriple_web_api.model.TripleResult;
+import com.example.pythatriple_web_api.repository.CalculationResultRepository;
+import com.example.pythatriple_web_api.repository.TripleResultRepository;
 
 @Service
 public class PythatripleService {
+
 	@Autowired
-	private PythatripleResultRepository repository;
+	private CalculationResultRepository calcRepo;
+
+	@Autowired
+	private TripleResultRepository tripleRepo;
 
 	public List<PythatripleTableResponse> getAllTriples() {
-		return repository.findAllByOrderByTimestampDesc()
+		return calcRepo.findAllByOrderByTimestampDesc()
 			.stream()
-			.filter(PythatripleResult::isValid)
-			.map(r -> new PythatripleTableResponse(
-				r.getHypotSq(), r.getA(), r.getB(), r.getC(), r.getAvg()
-			))
+			.filter(CalculationResult::isValid)
+			.map(c -> {
+				var t = c.getTriple();
+				return new PythatripleTableResponse(
+					c.getHypotSq(), t.getA(), t.getB(), t.getC(), t.getAvg()
+				);
+			})
 			.collect(Collectors.toList());
 	}
 
@@ -35,31 +44,40 @@ public class PythatripleService {
 			);
 		}
 
-		var cached = repository.findByHypotSq(hypotSq);
+		var cached = calcRepo.findByHypotSq(hypotSq);
 
 		if (cached.isPresent()) {
-			var result = cached.get();
+			var calc = cached.get();
 
-			if (result.isEmpty()) {
+			if (calc.isEmpty()) {
 				return Optional.empty();
 			}
 
+			var triple = calc.getTriple();
+
 			return Optional.of(new PythatripleResponse(
-				result.getA(), result.getB(), result.getC(), result.getAvg()
+				triple.getA(), triple.getB(), triple.getC(), triple.getAvg()
 			));
 		}
 
-		var resp = calculateTriple(hypotSq);
+		var r = calculateTriple(hypotSq);
 
-		var result = resp == null
-			? new PythatripleResult(hypotSq)
-			: new PythatripleResult(
-				hypotSq, resp.a(), resp.b(), resp.c(), resp.avg()
-			);
+		CalculationResult calc;
 
-		repository.save(result);
+		if (r == null) {
+			calc = new CalculationResult(hypotSq);
+		} else {
+			var triple = tripleRepo.findByAAndBAndC(r.a(), r.b(), r.c())
+				.orElseGet(() -> tripleRepo.save(
+					new TripleResult(r.a(), r.b(), r.c(), r.avg())
+				));
 
-		return Optional.ofNullable(resp);
+			calc = new CalculationResult(hypotSq, triple);
+		}
+
+		calcRepo.save(calc);
+
+		return Optional.ofNullable(r);
 	}
 
 	private PythatripleResponse calculateTriple(int hypotSq) {
