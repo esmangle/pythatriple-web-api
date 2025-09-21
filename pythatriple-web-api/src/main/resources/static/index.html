@@ -40,6 +40,11 @@
 	document.addEventListener("DOMContentLoaded", function() {
 		"use strict";
 
+		const numFormat = new Intl.NumberFormat("en", {
+			minimumFractionDigits: 1,
+			maximumFractionDigits: 2
+		});
+
 		const form = document.getElementById("formHypotSq");
 		const input = document.getElementById("inputHypotSq");
 		const button = document.getElementById("buttonSubmit");
@@ -50,21 +55,31 @@
 
 			button.disabled = true;
 
-			statusMessage.textContent = "Finding triples for squared hypotenuse 25...";
-			statusMessage.classList.remove("status-info", "status-ok", "status-fail");
-			statusMessage.classList.add("status-info");
-			statusMessage.style.display = "block";
+			showStatus(
+				`Finding pythagorean triple for squared hypotenuse ${25}...`,
+				"info"
+			);
 
 			setTimeout(function() {
-				statusMessage.textContent = "Success: 25 = 3² + 4² = 5² (average: 4.0)";
-				//statusMessage.textContent = "Fail: No pythagorean triples found for 25";
-				statusMessage.classList.remove("status-info", "status-ok", "status-fail");
-				statusMessage.classList.add("status-fail");
-				statusMessage.style.display = "block";
+				showStatus(
+					`Fail: No pythagorean triple found for ${25})`,
+					"fail"
+				);
+				showStatus(
+					`Success: ${25} = ${3}² + ${4}² = ${5}² (average: ${numFormat.format(4)})`,
+					"ok"
+				);
 
 				button.disabled = false;
 			}, 1000);
 		});
+
+		function showStatus(msg, type) {
+			statusMessage.textContent = msg;
+			statusMessage.classList.remove("status-info", "status-ok", "status-fail");
+			statusMessage.classList.add("status-" + type);
+			statusMessage.style.display = "block";
+		}
 	});
 	</script>
 </head>
