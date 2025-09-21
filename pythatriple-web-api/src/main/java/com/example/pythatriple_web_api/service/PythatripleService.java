@@ -78,7 +78,7 @@ public class PythatripleService {
 		) {}
 
 		Comparator<Triple> comp = Comparator
-			.comparing(Triple::primitive, Comparator.reverseOrder())
+			.comparing(Triple::primitive)
 			.thenComparingDouble(Triple::avg);
 
 		Triple best = null;

@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 
 import java.util.Optional;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -42,18 +43,22 @@ class PythatripleServiceTest {
 		assertEquals(a, r.a());
 		assertEquals(b, r.b());
 		assertEquals(c, r.c());
-		assertEquals(avg, r.avg());
+		assertEquals(avg, r.avg(), 0.001);
 	}
 
 	@ParameterizedTest(name = "hypotSq {0}: {1}² + {2}² = {3}² (avg={4})")
 	@CsvSource({
-		"25,3,4,5,4.0",
-		"100,6,8,10,8.0",
-		"2147395600,27804,37072,46340,37072.0",
+		"25,3,4,5,4.0", // smallest pythagorean triple
+		"169,5,12,13,10.0", // smallest hypotSq not divisible by 5
+		"15625,44,117,125,95.333333", // tests for primitive > non-primitive
+		"2147395600,27804,37072,46340,37072.0", // largest hypotSq under maxint
 	})
 	void testValidTriples(
 		int hypotSq, int a, int b, int c, double avg
 	) {
+		doReturn(Optional.empty()).when(repository).findByHypotSq(any());
+		doAnswer(i -> i.getArgument(0)).when(repository).save(any());
+
 		assertValidTriple(
 			service.getTriples(hypotSq),
 			a, b, c, avg
@@ -63,6 +68,9 @@ class PythatripleServiceTest {
 	@ParameterizedTest(name = "hypotSq {0}: no triples, return empty result")
 	@CsvSource({"1", "2147483647"})
 	void testEmptyResult(int hypotSq) {
+		doReturn(Optional.empty()).when(repository).findByHypotSq(any());
+		doAnswer(i -> i.getArgument(0)).when(repository).save(any());
+
 		assertTrue(service.getTriples(hypotSq).isEmpty());
 	}
 
@@ -77,6 +85,7 @@ class PythatripleServiceTest {
 
 	@Test
 	@DisplayName("Calculate triples for the same hypotSq only once, and ensure no dupes in database")
+	//
 	void testCaching() {
 		assertValidTriple(
 			service.getTriples(25),
@@ -113,7 +122,7 @@ class PythatripleServiceTest {
 		assertEquals(a, row.a());
 		assertEquals(b, row.b());
 		assertEquals(c, row.c());
-		assertEquals(avg, row.avg());
+		assertEquals(avg, row.avg(), 0.001);
 	}
 
 	@Test
@@ -121,19 +130,54 @@ class PythatripleServiceTest {
 	void testGetAllTriples() {
 		service.getTriples(25);
 		service.getTriples(1);
-		service.getTriples(100);
-		service.getTriples(100);
+		service.getTriples(169);
+		service.getTriples(169);
 		service.getTriples(1);
 		service.getTriples(25);
 
 		var table = service.getAllTriples();
 
 		assertEquals(2, table.size());
-		assertTableRow(table.get(0), 100, 6, 8, 10, 8.0);
+		assertTableRow(table.get(0), 169, 5, 12, 13, 10.0);
 		assertTableRow(table.get(1), 25, 3, 4, 5, 4.0);
 
 		verify(repository, times(3))
 			.save(any(PythatripleResult.class));
+	}
+
+	@Test
+	@DisplayName("Test all possible input integers to verify completeness and also performance")
+	void testTotal() {
+		doReturn(Optional.empty()).when(repository).findByHypotSq(any());
+		doAnswer(i -> i.getArgument(0)).when(repository).save(any());
+
+		long startTime = System.currentTimeMillis();
+
+		int count = 0;
+
+		for (int c = 1; c <= 46340; c++) {
+			var res = service.getTriples(c * c);
+
+			if (res.isPresent()) {
+				assertEquals(c, res.get().c());
+				count++;
+			}
+		}
+
+		long endTime = System.currentTimeMillis();
+
+		// this takes about ~2 secs on my i5-12400
+		System.out.printf(
+			"Found %d valid triples from %d cases in %d ms\n",
+			count, 46340, endTime - startTime
+		);
+
+		assertEquals(count, 31333);
+	}
+
+	@AfterEach
+	void afterEach() {
+		reset(repository);
 	}
 
 	@AfterTransaction
