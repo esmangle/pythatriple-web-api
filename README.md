@@ -11,7 +11,7 @@ Technologies used:
 
 Download source code:
 ```bash
-git clone https://github.com/esmangle/pythatriple-web-api.git
+git clone -b normalized-schema https://github.com/esmangle/pythatriple-web-api.git
 ```
 
 Run app:
