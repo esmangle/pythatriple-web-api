@@ -19,20 +19,27 @@
 			margin-top: 0.5rem;
 			font-weight: 500;
 		}
-		.status-info {
+		.status-message.status-info {
 			color: #b6effb;
 			background-color: #b6effb1a;
 			border: 1px solid #b6effb;
 		}
-		.status-ok {
+		.status-message.status-ok {
 			color: #4caf50;
 			background-color: #4caf501a;
 			border: 1px solid #4caf50;
 		}
-		.status-fail {
+		.status-message.status-fail {
 			color: #f44336;
 			background-color: #f443361a;
 			border: 1px solid #f44336;
+		}
+		@keyframes fadeIn {
+			from { opacity: 0; }
+			to { opacity: 1; }
+		}
+		.status-message.status-show {
+			animation: fadeIn 0.5s ease-in-out forwards;
 		}
 	</style>
 	<script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -41,8 +48,7 @@
 		"use strict";
 
 		const numFormat = new Intl.NumberFormat("en", {
-			minimumFractionDigits: 1,
-			maximumFractionDigits: 2
+			minimumFractionDigits: 1, maximumFractionDigits: 2,
 		});
 
 		const form = document.getElementById("formHypotSq");
@@ -63,6 +69,16 @@
 			const hypotSq = parseInt(input.value);
 
 			if (isNaN(hypotSq)) {
+				return;
+			}
+
+			if (hypotSq <= 0) {
+				showStatus("Fail: Input number must be a positive integer", "fail");
+				return;
+			}
+
+			if (hypotSq > 0x7FFFFFFF) {
+				showStatus("Fail: Input number is too large", "fail");
 				return;
 			}
 
@@ -99,15 +115,16 @@
 					return;
 				}
 
+				const msg = `Success: ${hypotSq} = ${data.a}² + ${data.b}² = ${data.c}² (average: ${numFormat.format(data.avg)})`;
+
 				updateStatus(() => {
-					showStatus(
-						`Success: ${hypotSq} = ${data.a}² + ${data.b}² = ${data.c}² (average: ${numFormat.format(data.avg)})`,
-						"ok"
-					);
+					showStatus(msg, "ok");
 				});
 			}, error => {
+				const msg = error.hypotenuse_squared || error.message || "An error occurred";
+
 				updateStatus(() => {
-					showStatus("test", "error");
+					showStatus(`Error: ${msg}`, "fail");
 				});
 			}, () => {
 				updateButton();
@@ -129,9 +146,14 @@
 
 		function showStatus(msg, type) {
 			statusMessage.textContent = msg;
-			statusMessage.classList.remove("status-info", "status-ok", "status-fail");
+			statusMessage.classList.remove(
+				"status-show", "status-info", "status-ok", "status-fail"
+			);
 			statusMessage.classList.add(`status-${type}`);
 			statusMessage.style.display = "block";
+			statusMessage.style.animation = "";
+			void statusMessage.offsetWidth;
+			statusMessage.classList.add("status-show");
 		}
 
 		// this is to prevent flickering due to fast response time
