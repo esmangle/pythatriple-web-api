@@ -38,7 +38,7 @@ class PythatripleServiceTest {
 		Optional<PythatripleResponse> res,
 		int hypotSq, int a, int b, int c, double avg
 	) {
-		assertTrue(res.isPresent(), "valid triple isn't for hypotSq " + hypotSq);
+		assertTrue(res.isPresent(), "valid triple isn't present for hypotSq " + hypotSq);
 		var r = res.get();
 		assertEquals(a, r.a(), "leg A is incorrect for hypotSq " + hypotSq);
 		assertEquals(b, r.b(), "leg B is incorrect for hypotSq " + hypotSq);
