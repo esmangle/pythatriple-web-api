@@ -7,6 +7,8 @@ Technologies used:
 * Maven build tool
 * Bootstrap 5.3.3
 
+click here for normalized schema version: https://github.com/esmangle/pythatriple-web-api/tree/normalized-schema
+
 ### How to run
 
 Download source code:
