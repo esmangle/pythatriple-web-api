@@ -60,6 +60,15 @@
 
 		const triplesMap = {};
 
+		getAllTriples(list => {
+			list.forEach(data => {
+				prependToTable(data.hypotSq, data);
+			});
+		}, error => {
+			console.error("Error loading triples:", error);
+			showStatus(`Error loading table: ${error.message}`, "fail");
+		});
+
 		let submissionDisabled = false;
 
 		form.addEventListener("submit", function(e) {
@@ -138,6 +147,19 @@
 
 		function getTriple(hypotSq, okFn, errFn, finallyFn) {
 			fetch(`/api/triples?hypotenuse_squared=${encodeURIComponent(hypotSq)}`)
+				.then(response => {
+					if (!response.ok) {
+						return response.json().then(err => { throw err; });
+					}
+					return response.json();
+				})
+				.then(okFn)
+				.catch(errFn)
+				.finally(finallyFn);
+		}
+
+		function getAllTriples(okFn, errFn, finallyFn) {
+			fetch("/api/triples")
 				.then(response => {
 					if (!response.ok) {
 						return response.json().then(err => { throw err; });
