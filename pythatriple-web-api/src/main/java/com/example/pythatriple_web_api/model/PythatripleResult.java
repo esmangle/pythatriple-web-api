@@ -20,7 +20,7 @@ public class PythatripleResult {
 
 	@Column(
 		name = "hypotenuse_squared", nullable = false, unique = true,
-		columnDefinition = "BIGINT UNSIGNED"
+		columnDefinition = "INT UNSIGNED"
 	)
 	private Integer hypotSq;
 
