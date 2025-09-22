@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.pythatriple_web_api.dto.PythatripleResponse;
 import com.example.pythatriple_web_api.dto.PythatripleTableResponse;
@@ -24,6 +25,7 @@ public class PythatripleService {
 	@Autowired
 	private TripleResultRepository tripleRepo;
 
+	@Transactional(readOnly = true)
 	public List<PythatripleTableResponse> getAllTriples() {
 		return calcRepo.findAllByOrderByTimestampDesc()
 			.stream()
@@ -37,6 +39,7 @@ public class PythatripleService {
 			.collect(Collectors.toList());
 	}
 
+	@Transactional()
 	public Optional<PythatripleResponse> getTriple(int hypotSq) {
 		if (hypotSq <= 0) {
 			throw new IllegalArgumentException(
