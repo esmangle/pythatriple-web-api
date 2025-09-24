@@ -20,7 +20,7 @@ class PythatripleService(
 		return calcRepo.findAllByOrderByTimestampDesc()
 			.filter { it.isValid }
 			.map { c ->
-				val t = c.triple
+				val t = c.triple!!
 				PythatripleTableResponse(
 					c.hypotSq, t.a, t.b, t.c, t.avg
 				)
