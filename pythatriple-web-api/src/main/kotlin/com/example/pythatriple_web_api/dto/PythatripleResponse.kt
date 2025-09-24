@@ -1,8 +1,7 @@
 package com.example.pythatriple_web_api.dto
 
 @JvmRecord
-data class PythatripleTableResponse(
-	val hypotSq: Int,
+data class PythatripleResponse(
 	val a: Int,
 	val b: Int,
 	val c: Int,
