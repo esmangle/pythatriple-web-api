@@ -80,37 +80,16 @@
 	</dependencies>
 
 	<build>
+		<sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
+		<testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
 		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
 			<plugin>
 				<groupId>org.jetbrains.kotlin</groupId>
 				<artifactId>kotlin-maven-plugin</artifactId>
-				<version>${kotlin.version}</version>
-				<executions>
-					<execution>
-						<id>compile</id>
-						<phase>process-sources</phase>
-						<goals>
-							<goal>compile</goal>
-						</goals>
-						<configuration>
-							<sourceDirs>
-								<sourceDir>src/main/kotlin</sourceDir>
-							</sourceDirs>
-						</configuration>
-					</execution>
-					<execution>
-						<id>test-compile</id>
-						<phase>process-sources</phase>
-						<goals>
-							<goal>test-compile</goal>
-						</goals>
-						<configuration>
-							<sourceDirs>
-								<sourceDir>src/test/kotlin</sourceDir>
-							</sourceDirs>
-						</configuration>
-					</execution>
-				</executions>
 				<configuration>
 					<jvmTarget>21</jvmTarget>
 					<args>
@@ -139,10 +118,6 @@
 						<version>${kotlin.version}</version>
 					</dependency>
 				</dependencies>
-			</plugin>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>
