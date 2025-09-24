@@ -35,7 +35,7 @@ class PythatripleControllerTest {
 			.andExpect(jsonPath("$.a").value(3))
 			.andExpect(jsonPath("$.b").value(4))
 			.andExpect(jsonPath("$.c").value(5))
-			.andExpect(jsonPath("$.avg").value(4.0));
+			.andExpect(jsonPath("$.avg").value(4.0))
 	}
 
 	@Test

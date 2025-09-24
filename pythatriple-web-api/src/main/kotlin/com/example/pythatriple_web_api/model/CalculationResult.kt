@@ -12,6 +12,7 @@ import java.time.LocalDateTime
 		UniqueConstraint(columnNames = ["hypotenuse_squared"], name = "uq_hypotsq")
 	]
 )
+@Suppress("UNUSED")
 class CalculationResult(
 	@NaturalId
 	@Column(

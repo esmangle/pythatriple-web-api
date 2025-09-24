@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api")
+@Suppress("UNUSED")
 class PythatripleController(
 	private val service: PythatripleService
 ) {

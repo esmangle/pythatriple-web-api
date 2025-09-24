@@ -10,6 +10,7 @@ import org.hibernate.annotations.NaturalId
 		UniqueConstraint(columnNames = ["leg_a", "leg_b", "hypotenuse"], name = "uq_triple")
 	]
 )
+@Suppress("UNUSED")
 class TripleResult(
 	@NaturalId
 	@Column(

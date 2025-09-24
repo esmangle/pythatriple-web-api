@@ -2,8 +2,6 @@ package com.example.pythatriple_web_api
 
 import com.example.pythatriple_web_api.dto.PythatripleResponse
 import com.example.pythatriple_web_api.dto.PythatripleTableResponse
-import com.example.pythatriple_web_api.model.CalculationResult
-import com.example.pythatriple_web_api.model.TripleResult
 import com.example.pythatriple_web_api.repository.CalculationResultRepository
 import com.example.pythatriple_web_api.repository.TripleResultRepository
 import com.example.pythatriple_web_api.service.PythatripleService
@@ -40,21 +38,21 @@ class PythatripleServiceTest {
 	) {
 		assertNotNull(res, "valid triple isn't present for hypotSq $hypotSq")
 		res!!
-		assertEquals(a, res.a, "leg A is incorrect for hypotSq $hypotSq");
-		assertEquals(b, res.b, "leg B is incorrect for hypotSq $hypotSq");
-		assertEquals(c, res.c, "hypotenuse is incorrect for hypotSq $hypotSq");
-		assertEquals(avg, res.avg, 0.001, "average is incorrect for hypotSq $hypotSq");
+		assertEquals(a, res.a, "leg A is incorrect for hypotSq $hypotSq")
+		assertEquals(b, res.b, "leg B is incorrect for hypotSq $hypotSq")
+		assertEquals(c, res.c, "hypotenuse is incorrect for hypotSq $hypotSq")
+		assertEquals(avg, res.avg, 0.001, "average is incorrect for hypotSq $hypotSq")
 	}
 
 	private fun assertTableRow(
 		row: PythatripleTableResponse,
 		hypotSq: Int, a: Int, b: Int, c: Int, avg: Double
 	) {
-		assertEquals(hypotSq, row.hypotSq);
-		assertEquals(a, row.a);
-		assertEquals(b, row.b);
-		assertEquals(c, row.c);
-		assertEquals(avg, row.avg, 0.001);
+		assertEquals(hypotSq, row.hypotSq)
+		assertEquals(a, row.a)
+		assertEquals(b, row.b)
+		assertEquals(c, row.c)
+		assertEquals(avg, row.avg, 0.001)
 	}
 
 	private fun stubRepositories() {
@@ -90,7 +88,7 @@ class PythatripleServiceTest {
 	@ParameterizedTest(name = "hypotSq {0}: non-positive, throw exception")
 	@CsvSource("0", "-25")
 	fun testNonPositive(hypotSq: Int) {
-		//stubRepositories();
+		//stubRepositories()
 
 		assertThrows<IllegalArgumentException> {
 			service.getTriple(hypotSq)
@@ -124,12 +122,12 @@ class PythatripleServiceTest {
 	@Test
 	@DisplayName("getAllTriples: list calculated triples in reverse insertion order, with only valid triples and no dupes")
 	fun testGetAllTriples() {
-		service.getTriple(25);
-		service.getTriple(1);
-		service.getTriple(169);
-		service.getTriple(169);
-		service.getTriple(1);
-		service.getTriple(25);
+		service.getTriple(25)
+		service.getTriple(1)
+		service.getTriple(169)
+		service.getTriple(169)
+		service.getTriple(1)
+		service.getTriple(25)
 
 		val list = service.getAllTriples()
 
