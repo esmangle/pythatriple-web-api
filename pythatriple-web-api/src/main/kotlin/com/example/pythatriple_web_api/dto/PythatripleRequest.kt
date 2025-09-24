@@ -6,5 +6,5 @@ import jakarta.validation.constraints.Positive
 data class PythatripleRequest(
 	@field:NotNull(message = "parameter is required")
 	@field:Positive(message = "must be a positive integer")
-	val hypotenuse_squared: Int
+	val hypotenuse_squared: Int?
 )

@@ -34,7 +34,7 @@ class PythatripleController(
 			return ResponseEntity.badRequest().body(errors)
 		}
 
-		val resp = service.getTriple(req.hypotenuse_squared)
+		val resp = service.getTriple(req.hypotenuse_squared!!)
 
 		return ResponseEntity.ok().body(
 			if (resp.isPresent) resp.get() else emptyMap<Any, Any>()
