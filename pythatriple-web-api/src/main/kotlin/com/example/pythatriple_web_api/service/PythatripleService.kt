@@ -8,6 +8,8 @@ import com.example.pythatriple_web_api.repository.CalculationResultRepository
 import com.example.pythatriple_web_api.repository.TripleResultRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import kotlin.math.roundToInt
+import kotlin.math.sqrt
 
 @Service
 class PythatripleService(
@@ -29,10 +31,8 @@ class PythatripleService(
 
 	@Transactional
 	fun getTriple(hypotSq: Int): PythatripleResponse? {
-		if (hypotSq <= 0) {
-			throw IllegalArgumentException(
-				"hypotSq must be a positive integer, but was: $hypotSq"
-			)
+		require(hypotSq > 0) {
+			"hypotSq must be a positive integer, but was: $hypotSq"
 		}
 
 		val cached = calcRepo.findByHypotSq(hypotSq)
@@ -68,6 +68,64 @@ class PythatripleService(
 	}
 
 	private fun calculateTriple(hypotSq: Int): PythatripleResponse? {
-		return null
+		require(hypotSq > 0) {
+			"hypotSq must be a positive integer, but was: $hypotSq"
+		}
+
+		val cDouble = sqrt(hypotSq.toDouble())
+		val c = cDouble.roundToInt()
+
+		if (c * c != hypotSq) {
+			return null
+		}
+
+		data class Triple(
+			val a: Int, val b: Int, val c: Int,
+			val avg: Double, val primitive: Boolean
+		)
+
+		val comp = compareBy<Triple> { it.primitive }
+			.thenByDescending { it.avg }
+
+		var best: Triple? = null
+
+		for (a in 1..(c / sqrt(2.0)).toInt()) {
+			val bSq = hypotSq - (a * a)
+
+			if (bSq <= 0) continue
+
+			val bDouble = sqrt(bSq.toDouble())
+
+			val b = bDouble.roundToInt()
+
+			if (b * b != bSq) continue
+
+			if (a >= b) continue
+
+			val avg = (a + b + c) / 3.0
+
+			val primitive = gcd(a, gcd(b, c)) == 1
+
+			val triple = Triple(a, b, c, avg, primitive)
+
+			if (best == null || comp.compare(best, triple) < 0) {
+				best = triple
+			}
+		}
+
+		return best?.let {
+			PythatripleResponse(it.a, it.b, it.c, it.avg)
+		}
+	}
+
+	private fun gcd(a: Int, b: Int): Int {
+		var x = a
+		var y = b
+		while (y != 0) {
+			val temp = y
+			y = x % y
+			x = temp
+		}
+		return x
 	}
 }
