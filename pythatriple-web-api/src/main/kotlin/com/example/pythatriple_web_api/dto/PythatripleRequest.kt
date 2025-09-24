@@ -3,10 +3,10 @@ package com.example.pythatriple_web_api.dto
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Positive
 
-@JvmRecord
 data class PythatripleRequest(
 	@field:NotNull(message = "parameter is required")
 	@field:Positive(message = "must be a positive integer")
-	@Suppress("PropertyName")
-	val hypotenuse_squared: Int?
-)
+	private val hypotenuse_squared: Int?
+){
+	val hypotSq: Int get() = requireNotNull(hypotenuse_squared)
+}
