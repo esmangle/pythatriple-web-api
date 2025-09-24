@@ -1,8 +1,11 @@
-spring boot backend + frontend example project, developed with VS Code on Debian Linux
+spring boot backend + frontend example project, developed with IntelliJ IDEA on Debian Linux
+
+converted to 100% kotlin from original java version (just for fun)
 
 Technologies used:
 * Spring Boot 3.5.6
-* Java 21
+* JDK 21
+* Kotlin 2.2.20
 * MySQL database
 * Maven build tool
 * Bootstrap 5.3.3
@@ -11,7 +14,7 @@ Technologies used:
 
 Download source code:
 ```bash
-git clone -b normalized-schema https://github.com/esmangle/pythatriple-web-api.git
+git clone -b kotlin https://github.com/esmangle/pythatriple-web-api.git
 ```
 
 Run app:
