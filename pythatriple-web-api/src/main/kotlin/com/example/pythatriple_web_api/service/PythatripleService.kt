@@ -62,6 +62,8 @@ class PythatripleService(
 			CalculationResult(hypotSq, triple)
 		}
 
+		calcRepo.save(calc)
+
 		return r
 	}
 
