@@ -18,7 +18,7 @@ class PythatripleController(
 
 	@GetMapping("triples")
 	fun getAllTriples(): ResponseEntity<*> {
-		return ResponseEntity.ok(service.allTriples)
+		return ResponseEntity.ok(service.getAllTriples())
 	}
 
 	@GetMapping("triples", params = ["hypotenuse_squared"])
@@ -37,7 +37,7 @@ class PythatripleController(
 		val resp = service.getTriple(req.hypotenuse_squared!!)
 
 		return ResponseEntity.ok().body(
-			if (resp.isPresent) resp.get() else emptyMap<Any, Any>()
+			resp ?: emptyMap<Any, Any>()
 		)
 	}
 }
