@@ -66,6 +66,7 @@ class PythatripleServiceTest {
 	@CsvSource(
 		"25,3,4,5,4.0", // smallest pythagorean triple
 		"169,5,12,13,10.0", // smallest hypotSq not divisible by 5
+		"4225,33,56,65,51.333333", // tests for high avg > lower avg
 		"15625,44,117,125,95.333333", // tests for primitive > non-primitive
 		"2147395600,27804,37072,46340,37072.0" // largest hypotSq under maxint
 	)

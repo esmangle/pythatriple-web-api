@@ -84,8 +84,7 @@ class PythatripleService(
 			val avg: Double, val primitive: Boolean
 		)
 
-		val comp = compareBy<Triple> { it.primitive }
-			.thenByDescending { it.avg }
+		val comp = compareBy<Triple> { it.primitive }.thenBy { it.avg }
 
 		var best: Triple? = null
 
